@@ -1,0 +1,65 @@
+{
+    "SurgeUSD": {
+        "address": "0x14fee7d23233ac941add278c123989b86ea7e1ff",
+        "symbol": "USD",
+		"icon": "https://s2.coinmarketcap.com/static/img/coins/64x64/4687.png",
+		"color": "eeb80c",
+        "fees": {
+            "buy": 0.06,
+            "sell": 0.06,
+            "transfer": 0.02
+        },
+        "table_name": "surge_usd"
+    },
+    "SurgeETH": {
+        "address": "0x5b1d1bbdcc432213f83b15214b93dc24d31855ef",
+        "symbol": "ETH",
+		"icon": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+		"color": "818384",
+        "fees": {
+            "buy": 0.06,
+            "sell": 0.06,
+            "transfer": 0.02
+        },
+        "table_name": "surge_eth"
+    },
+    "SurgeBTC": {
+        "address": "0xb68c9d9bd82bdf4eeecb22caa7f3ab94393108a1",
+        "symbol": "BTC",
+		"icon": "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+		"color": "F7931A",
+        "fees": {
+            "buy": 0.06,
+            "sell": 0.06,
+            "transfer": 0.03
+        },
+        "table_name": "surge_btc"
+    },
+    "SurgeADA": {
+        "address": "0xbf6bb9b8004942dfb3c1cde3cb950af78ab8a5af",
+        "symbol": "ADA",
+		"icon": "https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png",
+		"color": "0133AE",
+        "fees": {
+            "buy": 0.04,
+            "sell": 0.04,
+            "transfer": 0.02
+        },
+        "table_name": "surge_ada"
+    },
+    "SurgeUSLS": {
+        "address": "0x2e62e57d1d36517d4b0f329490ac1b78139967c0",
+        "symbol": "USELESS",
+		"icon": "https://s2.coinmarketcap.com/static/img/coins/64x64/10851.png",
+		"color": "EAB729",
+        "fees": {
+            "buy": 0.08,
+            "sell": 0.08,
+            "staked": 0.06,
+            "transfer": 0.04
+        },
+        "allows_staking": true,
+        "underlying_asset_sell_fee": 0.08,
+        "table_name": "surge_useless"
+    }
+  }
