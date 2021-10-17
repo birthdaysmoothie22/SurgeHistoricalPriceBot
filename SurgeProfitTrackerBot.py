@@ -30,10 +30,14 @@ def createCalcResultEmbedMessage(token, result):
         description="", 
         color=0x22B4AB)
     embed.set_thumbnail(url=surge_tokens[token]['icon'])
-    embed.add_field(name="Total Amount Bought", value=data[token]['total_underlying_asset_amount_purchased'], inline=False)
-    embed.add_field(name="Total Amount Sold", value=data[token]['total_underlying_asset_amount_received'], inline=False)
-    embed.add_field(name="Current Value of Surge After Sell Fee", value=data[token]['current_underlying_asset_value'], inline=False)
-    embed.add_field(name="Overall +/- Profit", value=data[token]['overall_profit_or_loss'], inline=False)
+    embed.add_field(name="Total Amount Bought in USD", value=data[token]['total_underlying_asset_amount_purchased'], inline=False)
+    if token != 'SurgeUSD':
+        embed.add_field(name="Total Amount Bought in "+surge_tokens[token]['symbol'], value=data[token]['total_underlying_asset_value_purchased'], inline=False)
+    embed.add_field(name="Total Amount Sold in USD", value=data[token]['total_underlying_asset_amount_received'], inline=False)
+    embed.add_field(name="Current Value of Surge After Sell Fee in USD", value=data[token]['current_underlying_asset_value'], inline=False)
+    if token != 'SurgeUSD':
+        embed.add_field(name="Current Value of Surge After Sell Fee in "+surge_tokens[token]['symbol'], value=data[token]['current_underlying_asset_amount'], inline=False)
+    embed.add_field(name="Overall +/- Profit in USD", value=data[token]['overall_profit_or_loss'], inline=False)
     
     embed_disclaimer_text = "This bot gives you a close approximation of your overall accrual of Surge Token value. This is accomplished by pulling buyer transaction history and tracking historical price data on both the Surge Token and it's backing asset. Due to volatility of the backing asset, the price average between milliseconds of every transaction is used to attain the historical value. Because of this, the reflected value may not be 100% accurate. Estimated accuracy is estimated to be within 90-100%. \n\nPlease contact birthdaysmoothie#9602 if you have any question, issues, or data-related concerns."
     embed.set_footer(text=embed_disclaimer_text)

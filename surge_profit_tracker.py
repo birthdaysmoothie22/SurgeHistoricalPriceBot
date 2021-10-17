@@ -55,6 +55,7 @@ def calculateSurgeProfits(wallet_address, surge_token):
         tokens_inbound = 0
         tokens_outbound = 0
         total_underlying_asset_amount_purchased = 0
+        total_underlying_asset_value_purchased = 0
         total_underlying_asset_amount_received = 0
         
         db_table_name = surge_tokens[token]['table_name']
@@ -126,18 +127,20 @@ def calculateSurgeProfits(wallet_address, surge_token):
                 tokens_inbound += surge_token_amount
                 underlying_asset_price = underlying_asset_value_data[rounded_down_date][0] + underlying_asset_value_interval * times
                 underlying_asset_price_at_transaction = float(f'{underlying_asset_price:.18f}')
+                
                 underlying_asset_value_at_transaction = float(f'{token_price_at_transaction * (surge_token_amount / (1 - tx_fee)):.18f}') 
+                total_underlying_asset_value_purchased += underlying_asset_value_at_transaction
+                
                 underlying_asset_amount_purchased = underlying_asset_price_at_transaction * underlying_asset_value_at_transaction
-
                 total_underlying_asset_amount_purchased += underlying_asset_amount_purchased
             elif tx_type == 'sell':
                 tx_fee = fees[tx_type]
                 tokens_outbound += surge_token_amount
                 underlying_asset_price = underlying_asset_value_data[rounded_down_date][0] + underlying_asset_value_interval * times
                 underlying_asset_price_at_transaction = float(f'{underlying_asset_price:.18f}')
-                underlying_asset_value_at_transaction = float(f'{token_price_at_transaction * (surge_token_amount * (1 - tx_fee)):.18f}') 
+                underlying_asset_value_at_transaction = float(f'{token_price_at_transaction * (surge_token_amount * (1 - tx_fee)):.18f}')
                 underlying_asset_amount_received = underlying_asset_price_at_transaction * underlying_asset_value_at_transaction
-
+                
                 total_underlying_asset_amount_received += underlying_asset_amount_received
             elif tx_type == 'sent':
                 tx_fee = fees['transfer']
@@ -146,6 +149,7 @@ def calculateSurgeProfits(wallet_address, surge_token):
             elif tx_type == 'received':
                 tokens_inbound += surge_token_amount
             
+        result[token]['total_underlying_asset_value_purchased'] = "{:,.9f}".format(total_underlying_asset_value_purchased)
         result[token]['total_underlying_asset_amount_purchased'] = '$'+"{:,.2f}".format(total_underlying_asset_amount_purchased)
         result[token]['total_underlying_asset_amount_received'] = '$'+"{:,.2f}".format(total_underlying_asset_amount_received)
 
@@ -164,7 +168,8 @@ def calculateSurgeProfits(wallet_address, surge_token):
             current_underlying_asset_value = current_value_of_surge_underlying_asset * float(current_token_value_data['underlying_asset_value'])
 
             current_underlying_asset_value = current_underlying_asset_value
-
+        
+        result[token]['current_underlying_asset_amount'] = "{:,.9f}".format(current_value_of_surge_underlying_asset)
         result[token]['current_underlying_asset_value'] = '$'+"{:,.2f}".format(current_underlying_asset_value)
 
         overall_profit_or_loss = (current_underlying_asset_value + total_underlying_asset_amount_received) - total_underlying_asset_amount_purchased
