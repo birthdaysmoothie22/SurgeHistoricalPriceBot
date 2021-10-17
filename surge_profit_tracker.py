@@ -27,7 +27,7 @@ def roundToNearestMinuteInterval(tx_timestamp, round_down = True):
         datetime_time = datetime.datetime.fromtimestamp(rounded_up_timestamp)
         return datetime_time.strftime("%Y-%m-%d %H:%M:%S")
 
-def calculateSurgeProfits(wallet_address, token):
+def calculateSurgeProfits(wallet_address, surge_token):
     #setup DB connection
     mydb = mysql.connector.connect(
         host = os.getenv('DB_HOST'),
@@ -39,8 +39,12 @@ def calculateSurgeProfits(wallet_address, token):
     mycursor = mydb.cursor()
 
     # Get All Surge Transactions
-    surge_transactions_json = surge_get_wallet_transactions.fetch_transactions(wallet_address, token)
-    surge_transactions = json.loads(surge_transactions_json)
+    if surge_token == "all":
+        surge_transactions_json = surge_get_wallet_transactions.fetch_all_transactions(wallet_address)
+        surge_transactions = surge_transactions_json
+    else:
+        surge_transactions_json = surge_get_wallet_transactions.fetch_transactions(wallet_address, surge_token)
+        surge_transactions = json.loads(surge_transactions_json)
 
     result = {}
     for token in surge_transactions:

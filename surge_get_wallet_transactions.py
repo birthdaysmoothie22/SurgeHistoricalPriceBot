@@ -2,12 +2,15 @@ import os
 import json
 import requests
 import time
+import random
 from dotenv import load_dotenv
 
 #load environment variables
 load_dotenv()
 
-API_KEY = os.getenv('API_KEY_BSC')
+API_KEYS_BSC = os.getenv('API_KEYS_BSC')
+API_KEY_LIST = API_KEYS_BSC.split(",")
+
 ROOT_PATH = os.getenv('ROOT_PATH')
 
 with open(ROOT_PATH+"/surge_tokens.json", "r") as surge_tokens_json:
@@ -30,8 +33,11 @@ def checkRateLimit():
 def fetch_all_transactions(wallet_address):
     output = {}
     for token in surge_tokens:
-        output[token] = fetch_transactions(wallet_address, token)
-    return json.dumps(output)
+        result = fetch_transactions(wallet_address, token)
+        result = json.loads(result)
+        output[token] = result[token]
+    #return json.dumps(output)
+    return output
 
 # Fetch transactions for a specific surge token from a specific wallet
 def fetch_transactions(wallet_address, surge_token, uri="https://api.bscscan.com/api"):
@@ -48,7 +54,9 @@ def fetch_transactions(wallet_address, surge_token, uri="https://api.bscscan.com
         wallet_address = wallet_address.lower()
         contract_address = surge_tokens[surge_token]['address']
 
-        payload = {"module": "account", "action": "tokentx", "contractaddress": contract_address, "address": wallet_address, "apikey": API_KEY}
+        api_key = random.choice(API_KEY_LIST)
+
+        payload = {"module": "account", "action": "tokentx", "contractaddress": contract_address, "address": wallet_address, "apikey": api_key}
         # buy = []
         # sell = []
         # received = []
@@ -64,8 +72,10 @@ def fetch_transactions(wallet_address, surge_token, uri="https://api.bscscan.com
                 tx_type = ""
                 if tx["to"] == wallet_address and tx["from"] == contract_address:
                     if 'allows_staking' in surge_tokens[surge_token] and surge_tokens[surge_token]['allows_staking']:
+                        api_key = random.choice(API_KEY_LIST)
+
                         log_payload = {"module": "logs", "action": "getLogs", "address": contract_address,
-                                    "topic0": "0x1c54f863308f3c46dc337349cd7c614a0aea0216aaf309e650c41479696ff927", "apikey": API_KEY,
+                                    "topic0": "0x1c54f863308f3c46dc337349cd7c614a0aea0216aaf309e650c41479696ff927", "apikey": api_key,
                                     "fromBlock": tx["blockNumber"], "toBlock": tx["blockNumber"]
                                     }
                         checkRateLimit()

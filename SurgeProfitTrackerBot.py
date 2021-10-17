@@ -53,31 +53,38 @@ def createCustomHelpEmbedMessage():
 
     return embed
 
-async def processProfitCalculation(ctx, token, wallet_address):
-    if surge_profit_tracker_queue.checkQueuePlace(ctx.author.id) == 0:
-        await ctx.author.send("I'm calculating your profits now")
+# Old calculateProfits function that has queue in it
+#
+# async def calculateProfits(ctx, token, wallet_address):
+#     tracker_queue_count = surge_profit_tracker_queue.checkQueueCount()
+#     if tracker_queue_count < 5:
+#         surge_profit_tracker_queue.addToQueue(ctx.author.id)
+#         queue_place = surge_profit_tracker_queue.checkQueuePlace(ctx.author.id)
+#         # check queue place and send a message
+#         if queue_place > 0:
+#             await ctx.author.send("You are #"+str(queue_place)+" in line. I'll message you your results when I'm done calculating.")     
+        
+#         await processProfitCalculation(ctx, token, wallet_address)
+#         return
+#     else:
+#         await ctx.author.send("There are too many people requesting right now, please try again leter.  You can check the queue count at anytime by typing in !queue")
+#         return
+
+async def calculateProfits(ctx, token, wallet_address):
+    await ctx.author.send("I'm calculating your profits now")
+    result = surge_profit_tracker.calculateSurgeProfits(wallet_address, token)
+    embed = createCalcResultEmbedMessage(token, result)
+    await ctx.author.send(embed=embed)
+    return
+
+async def calculateAllProfits(ctx, wallet_address):
+    await ctx.author.send("I'm calculating your profits now")
+    for token in surge_tokens:
         result = surge_profit_tracker.calculateSurgeProfits(wallet_address, token)
         embed = createCalcResultEmbedMessage(token, result)
         await ctx.author.send(embed=embed)
-        surge_profit_tracker_queue.removeFromQueue(ctx.author.id)
-    else:
-        await asyncio.sleep(1)
-        await processProfitCalculation(ctx, token, wallet_address)
-
-async def calculateProfits(ctx, token, wallet_address):
-    tracker_queue_count = surge_profit_tracker_queue.checkQueueCount()
-    if tracker_queue_count < 5:
-        surge_profit_tracker_queue.addToQueue(ctx.author.id)
-        queue_place = surge_profit_tracker_queue.checkQueuePlace(ctx.author.id)
-        # check queue place and send a message
-        if queue_place > 0:
-            await ctx.author.send("You are #"+str(queue_place)+" in line. I'll message you your results when I'm done calculating.")     
-        
-        await processProfitCalculation(ctx, token, wallet_address)
-        return
-    else:
-        await ctx.author.send("There are too many people requesting right now, please try again leter.  You can check the queue count at anytime by typing in !queue")
-        return
+    return
+ 
 
 bot = commands.Bot(command_prefix='', owner_id=OWNER_DISCORD_ID, help_command=None)
 
@@ -93,6 +100,10 @@ async def calculate(ctx):
         components =
         [Select(placeholder="Select a Surge Token",
                 options=[
+                    SelectOption(
+                        label="Show All", 
+                        value="all"
+                    ),
                     SelectOption(
                         label="SurgeUSD", 
                         value="SurgeUSD"
@@ -139,9 +150,17 @@ async def calculate(ctx):
         except asyncio.TimeoutError:
             await ctx.send("Sorry, you either did't reply with your wallet address or didn't reply in time!")
             return
-            
-        await calculateProfits(ctx, token, wallet_address.content)
-        return
+        
+        if token == 'all':
+            await calculateAllProfits(ctx, wallet_address.content)
+            #@todo give the user the option to receive this daily?
+            #would have to store discord id with wallet address
+            #have a cron that pulls the data daily and sends out an embed 
+            return
+        else:
+            await calculateProfits(ctx, token, wallet_address.content)
+            #@todo give the user the option to pick another token without asking them for their wallet again
+            return
         
     except discord.NotFound:
         return # not sure what to do here...
@@ -165,11 +184,11 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.author.send("I did not get the required details for this request. A proper request looks like this !calculate_manual *token* *wallet_address*")
 
-@bot.command(aliases=['Queue'])
-@commands.dm_only()
-async def queue(ctx):
-    tracker_queue = surge_profit_tracker_queue.checkQueueCount()
-    await ctx.author.send("There are "+str(tracker_queue)+" people in the profit tracker queue")
+# @bot.command(aliases=['Queue'])
+# @commands.dm_only()
+# async def queue(ctx):
+#     tracker_queue = surge_profit_tracker_queue.checkQueueCount()
+#     await ctx.author.send("There are "+str(tracker_queue)+" people in the profit tracker queue")
 
 @bot.command(aliases=['List'])
 @commands.dm_only()
@@ -187,33 +206,33 @@ async def help(ctx):
     await ctx.author.send(embed=help_embed)
 
 # start owner commands only
-@bot.command(aliases=['Queue_entries'])
-@commands.is_owner()
-@commands.dm_only()
-async def queue_entries(ctx):
-    message = '```'
-    if len(surge_profit_tracker_queue.surge_profit_tracker_queue) > 0:
-        for k in surge_profit_tracker_queue.surge_profit_tracker_queue:
-            if k in surge_profit_tracker_queue.surge_profit_tracker_queue_users_times:
-                message += str(k)+' since '+surge_profit_tracker_queue.surge_profit_tracker_queue_users_times[k]+'\n'
-            else:
-                message += str(k)+'\n'
-    else:
-        message += 'No queue entries'
-    message += '```'
-    await ctx.author.send(message)
+# @bot.command(aliases=['Queue_entries'])
+# @commands.is_owner()
+# @commands.dm_only()
+# async def queue_entries(ctx):
+#     message = '```'
+#     if len(surge_profit_tracker_queue.surge_profit_tracker_queue) > 0:
+#         for k in surge_profit_tracker_queue.surge_profit_tracker_queue:
+#             if k in surge_profit_tracker_queue.surge_profit_tracker_queue_users_times:
+#                 message += str(k)+' since '+surge_profit_tracker_queue.surge_profit_tracker_queue_users_times[k]+'\n'
+#             else:
+#                 message += str(k)+'\n'
+#     else:
+#         message += 'No queue entries'
+#     message += '```'
+#     await ctx.author.send(message)
 
-    return
+#     return
 
-@bot.command(aliases=['Remove_queue_entry'])
-@commands.is_owner()
-@commands.dm_only()
-async def remove_queue_entry(ctx, user_id):
-    surge_profit_tracker_queue.removeFromQueue(int(user_id))
-    message = user_id+" has been removed from the queue"
-    await ctx.author.send(message)
+# @bot.command(aliases=['Remove_queue_entry'])
+# @commands.is_owner()
+# @commands.dm_only()
+# async def remove_queue_entry(ctx, user_id):
+#     surge_profit_tracker_queue.removeFromQueue(int(user_id))
+#     message = user_id+" has been removed from the queue"
+#     await ctx.author.send(message)
     
-    return
+#     return
 
 @bot.command(aliases=['Restart'])
 @commands.is_owner()
