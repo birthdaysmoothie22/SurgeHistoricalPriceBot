@@ -43,13 +43,13 @@ def createCalcResultEmbedMessage(token, result):
 def createCustomHelpEmbedMessage():
     embed = discord.Embed(
         title="Available SurgeProfitTrackerBot Commands",
-        description="Here are all the available commands for the SurgeProfitTrackerBot.\nAll commands must start with !", 
+        description="Here are all the available commands for the SurgeProfitTrackerBot.", 
         color=0x22B4AB)
     embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/892852181802291215/898293624528338944/Profit_Checker_3.png")
-    embed.add_field(name="!calculate", value="Calculates your overall Surge Token value.  Requires you to pick a token and provide your public wallet address.", inline=False)
-    embed.add_field(name="!calculate_manual", value="Calculates your overall Surge Token value.  You must provide the token you wish to caluclate and your public wallet address.  Example: !calculate_manual SurgeADA 0x00a...", inline=False)
-    embed.add_field(name="!list", value="View available tokens to choose from.", inline=False)
-    embed.add_field(name="!queue", value="View how many people are queued up to calculate profits.", inline=False)
+    embed.add_field(name="calculate, calc", value="Calculates your overall Surge Token value.  Requires you to pick a token and provide your public wallet address.", inline=False)
+    embed.add_field(name="calculate_manual, calc_manual", value="Calculates your overall Surge Token value.  You must provide the token you wish to caluclate and your public wallet address.  Example: !calculate_manual SurgeADA 0x00a...", inline=False)
+    embed.add_field(name="list", value="View available tokens to choose from.", inline=False)
+    embed.add_field(name="queue", value="View how many people are queued up to calculate profits.", inline=False)
 
     return embed
 
@@ -165,13 +165,13 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.author.send("I did not get the required details for this request. A proper request looks like this !calculate_manual *token* *wallet_address*")
 
-@bot.command(brief='Returns how many people are in the tracker queue')
+@bot.command(aliases=['Queue'])
 @commands.dm_only()
 async def queue(ctx):
     tracker_queue = surge_profit_tracker_queue.checkQueueCount()
     await ctx.author.send("There are "+str(tracker_queue)+" people in the profit tracker queue")
 
-@bot.command(brief='Lists available tokens to calculate')
+@bot.command(aliases=['List'])
 @commands.dm_only()
 async def list(ctx):
     message = 'Here are a list of available tokens to calculate: \n'
@@ -180,14 +180,14 @@ async def list(ctx):
         message += token+"\n"
     await ctx.author.send(message)
 
-@bot.command()
+@bot.command(aliases=['Help'])
 @commands.dm_only()
 async def help(ctx):
     help_embed = createCustomHelpEmbedMessage()
     await ctx.author.send(embed=help_embed)
 
 # start owner commands only
-@bot.command()
+@bot.command(aliases=['Queue_entries'])
 @commands.is_owner()
 @commands.dm_only()
 async def queue_entries(ctx):
@@ -205,7 +205,7 @@ async def queue_entries(ctx):
 
     return
 
-@bot.command()
+@bot.command(aliases=['Remove_queue_entry'])
 @commands.is_owner()
 @commands.dm_only()
 async def remove_queue_entry(ctx, user_id):
@@ -215,7 +215,7 @@ async def remove_queue_entry(ctx, user_id):
     
     return
 
-@bot.command()
+@bot.command(aliases=['Restart'])
 @commands.is_owner()
 @commands.dm_only()
 async def restart(ctx):
