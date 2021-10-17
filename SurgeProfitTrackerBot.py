@@ -215,13 +215,13 @@ async def remove_queue_entry(ctx, user_id):
     
     return
 
-# @bot.command()
-# @commands.is_owner()
-# @commands.dm_only()
-# async def restart(ctx):
-#     await ctx.author.send("Bot is restarting")
-#     os.system("pm2 restart SurgeProfitTrackerBotV2 --interpreter python3")
+@bot.command()
+@commands.is_owner()
+@commands.dm_only()
+async def restart(ctx):
+    await ctx.author.send("Bot is restarting")
+    os.system("pm2 restart SurgeProfitTrackerBot --interpreter python3")
 
-#     return
+    return
 
 bot.run(SURGE_PROFIT_TRACKER_BOT_KEY)

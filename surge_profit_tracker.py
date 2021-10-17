@@ -42,8 +42,6 @@ def calculateSurgeProfits(wallet_address, token):
     surge_transactions_json = surge_get_wallet_transactions.fetch_transactions(wallet_address, token)
     surge_transactions = json.loads(surge_transactions_json)
 
-    print(surge_transactions)
-
     result = {}
     for token in surge_transactions:
         result[token] = {}
@@ -118,41 +116,35 @@ def calculateSurgeProfits(wallet_address, token):
             #Get the token price at time of transaction
             token_price = token_value_data[rounded_down_date][0] + (token_value_interval * times)
             token_price_at_transaction = float(f'{token_price:.18f}')
-            
-            try:
-                if tx_type == 'buy' or tx_type == 'staked':
-                    tx_fee = fees[tx_type]
-                    tokens_inbound += surge_token_amount
-                    underlying_asset_price = underlying_asset_value_data[rounded_down_date][0] + underlying_asset_value_interval * times
-                    underlying_asset_price_at_transaction = float(f'{underlying_asset_price:.18f}')
-                    underlying_asset_value_at_transaction = float(f'{token_price_at_transaction * (surge_token_amount / (1 - tx_fee)):.18f}') 
-                    underlying_asset_amount_purchased = underlying_asset_price_at_transaction * underlying_asset_value_at_transaction
 
-                    total_underlying_asset_amount_purchased += underlying_asset_amount_purchased
-                elif tx_type == 'sell':
-                    tx_fee = fees[tx_type]
-                    tokens_outbound += surge_token_amount
-                    underlying_asset_price = underlying_asset_value_data[rounded_down_date][0] + underlying_asset_value_interval * times
-                    underlying_asset_price_at_transaction = float(f'{underlying_asset_price:.18f}')
-                    underlying_asset_value_at_transaction = float(f'{token_price_at_transaction * (surge_token_amount * (1 - tx_fee)):.18f}') 
-                    underlying_asset_amount_received = underlying_asset_price_at_transaction * underlying_asset_value_at_transaction
+            if tx_type == 'buy' or tx_type == 'staked':
+                tx_fee = fees[tx_type]
+                tokens_inbound += surge_token_amount
+                underlying_asset_price = underlying_asset_value_data[rounded_down_date][0] + underlying_asset_value_interval * times
+                underlying_asset_price_at_transaction = float(f'{underlying_asset_price:.18f}')
+                underlying_asset_value_at_transaction = float(f'{token_price_at_transaction * (surge_token_amount / (1 - tx_fee)):.18f}') 
+                underlying_asset_amount_purchased = underlying_asset_price_at_transaction * underlying_asset_value_at_transaction
 
-                    total_underlying_asset_amount_received += underlying_asset_amount_received
-                elif tx_type == 'sent':
-                    tx_fee = fees['transfer']
-                    print(surge_token_amount)
-                    surge_token_amount = surge_token_amount / (1 - tx_fee)
-                    print(surge_token_amount)
-                    tokens_outbound += surge_token_amount
-                elif tx_type == 'received':
-                    tokens_inbound += surge_token_amount
-            except:
-                print('an exception occured')
+                total_underlying_asset_amount_purchased += underlying_asset_amount_purchased
+            elif tx_type == 'sell':
+                tx_fee = fees[tx_type]
+                tokens_outbound += surge_token_amount
+                underlying_asset_price = underlying_asset_value_data[rounded_down_date][0] + underlying_asset_value_interval * times
+                underlying_asset_price_at_transaction = float(f'{underlying_asset_price:.18f}')
+                underlying_asset_value_at_transaction = float(f'{token_price_at_transaction * (surge_token_amount * (1 - tx_fee)):.18f}') 
+                underlying_asset_amount_received = underlying_asset_price_at_transaction * underlying_asset_value_at_transaction
+
+                total_underlying_asset_amount_received += underlying_asset_amount_received
+            elif tx_type == 'sent':
+                tx_fee = fees['transfer']
+                surge_token_amount = surge_token_amount / (1 - tx_fee)
+                tokens_outbound += surge_token_amount
+            elif tx_type == 'received':
+                tokens_inbound += surge_token_amount
             
-            print(tx)
         result[token]['total_underlying_asset_amount_purchased'] = '$'+"{:,.2f}".format(total_underlying_asset_amount_purchased)
         result[token]['total_underlying_asset_amount_received'] = '$'+"{:,.2f}".format(total_underlying_asset_amount_received)
-        print(result)
+
         remaining_tokens = tokens_inbound - tokens_outbound
         current_underlying_asset_value = 0
         if remaining_tokens > 0:
@@ -176,5 +168,5 @@ def calculateSurgeProfits(wallet_address, token):
     
     mycursor.close()
     mydb.close()
-    print(result)
+    
     return json.dumps(result)
