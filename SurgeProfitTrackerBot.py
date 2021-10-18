@@ -79,6 +79,20 @@ def createCustomHelpEmbedMessage():
 #         await ctx.author.send("There are too many people requesting right now, please try again leter.  You can check the queue count at anytime by typing in !queue")
 #         return
 
+def checkUserRoles(ctx):
+    access_allowed = False
+    # This is the xSurge server guild
+    guild = bot.get_guild(870722243750141972)
+    member = guild.get_member(ctx.author.id)
+    acceptable_roles = ['community manager','senior mod','discord mod','telegram mod','facebook mod','instagram community manager','project management','marketing manager','social media developer','dev team',]
+    if member != None:
+        for role in member.roles:
+            if str(role).lower() in acceptable_roles:
+                access_allowed = True
+
+    return access_allowed
+
+
 async def calculateProfits(ctx, token, wallet_address):
     await ctx.author.send("I'm creating your report now:")
     result = surge_profit_tracker.calculateSurgeProfits(wallet_address, token)
@@ -96,7 +110,9 @@ async def calculateAllProfits(ctx, wallet_address):
     await ctx.author.send("All your reports are complete.")
     return
 
-bot = commands.Bot(command_prefix='', owner_id=OWNER_DISCORD_ID, help_command=None)
+intents = discord.Intents.default()
+intents.members = True
+bot = commands.Bot(command_prefix='', owner_id=OWNER_DISCORD_ID, help_command=None, intents=intents)
 
 @bot.event
 async def on_ready():
@@ -106,113 +122,119 @@ async def on_ready():
 @bot.command(aliases=['Calculate', 'calc'])
 @commands.dm_only()
 async def calculate(ctx):
-    message = await ctx.author.send("Pick a Surge token to calculate", delete_after=30,
-        components =
-        [Select(placeholder="Select a Surge Token",
-                options=[
-                    SelectOption(
-                        label="Show All", 
-                        value="all"
-                    ),
-                    SelectOption(
-                        label="SurgeUSD", 
-                        value="SurgeUSD"
-                    ),
-                    SelectOption(
-                        label="SurgeETH", 
-                        value="SurgeETH"
-                    ),
-                    SelectOption(
-                        label="SurgeBTC", 
-                        value="SurgeBTC"
-                    ),
-                    SelectOption(
-                        label="SurgeADA", 
-                        value="SurgeADA"
-                    ),
-                    SelectOption(
-                        label="SurgeUSLS", 
-                        value="SurgeUSLS"
-                    ),
-                ]
-            )
-        ]
-    )
-
-    try:
-        # Wait for the user to select a token
-        event = await bot.wait_for("select_option", check = None, timeout = 30) # 30 seconds to reply
-
-        token = event.values[0]
-        response_messsge = "You selected "+token
-        await ctx.author.send(response_messsge)
-        # Delete the original drop down so the user can't interact with it again
-        await message.delete()
-
-        message_2 = 'Please tell me your wallet address\n'
-        await ctx.author.send(message_2)
-
-        def check_message_2(msg):
-            return msg.author == ctx.author and len(msg.content) > 0
+    if checkUserRoles(ctx):
+        message = await ctx.author.send("Pick a Surge token to calculate", delete_after=30,
+            components =
+            [Select(placeholder="Select a Surge Token",
+                    options=[
+                        SelectOption(
+                            label="Show All", 
+                            value="all"
+                        ),
+                        SelectOption(
+                            label="SurgeUSD", 
+                            value="SurgeUSD"
+                        ),
+                        SelectOption(
+                            label="SurgeETH", 
+                            value="SurgeETH"
+                        ),
+                        SelectOption(
+                            label="SurgeBTC", 
+                            value="SurgeBTC"
+                        ),
+                        SelectOption(
+                            label="SurgeADA", 
+                            value="SurgeADA"
+                        ),
+                        SelectOption(
+                            label="SurgeUSLS", 
+                            value="SurgeUSLS"
+                        ),
+                    ]
+                )
+            ]
+        )
 
         try:
-            wallet_address = await bot.wait_for("message", check=check_message_2, timeout = 30) # 30 seconds to reply
-        except asyncio.TimeoutError:
-            await ctx.send("Sorry, you either did't reply with your wallet address or didn't reply in time!")
-            return
-        
-        if token == 'all':
-            await calculateAllProfits(ctx, wallet_address.content)
+            # Wait for the user to select a token
+            event = await bot.wait_for("select_option", check = None, timeout = 30) # 30 seconds to reply
+
+            token = event.values[0]
+            response_messsge = "You selected "+token
+            await ctx.author.send(response_messsge)
+            # Delete the original drop down so the user can't interact with it again
+            await message.delete()
+
+            message_2 = 'Please tell me your wallet address\n'
+            await ctx.author.send(message_2)
+
+            def check_message_2(msg):
+                return msg.author == ctx.author and len(msg.content) > 0
 
             try:
-                with open(ROOT_PATH+"/daily_report_list.json", "r") as daily_report_list_json:
-                    daily_report_list = json.load(daily_report_list_json)
-                
-                if str(ctx.author.id) not in daily_report_list:
-                    daily_report_list_message = 'Would you like to receive these reports daily [Y/N]?\n'
-                    daily_report_list_message += 'It will require me to save your wallet address so I can automatically send them to you.'
-                    await ctx.author.send(daily_report_list_message)
-
-                    def check_message(msg):
-                        return msg.author == ctx.author and len(msg.content) > 0
-                    
-                    daily_report_list_response = await bot.wait_for("message", check=check_message, timeout = 30) # 30 seconds to reply
-                    acceptable_responses = ['y','Y','yes','Yes']
-                    if daily_report_list_response.content.lower() in acceptable_responses:
-                        daily_report_list[ctx.author.id] = wallet_address.content
-
-                        with open(ROOT_PATH+"/daily_report_list.json", "w") as daily_report_list_json:
-                            json.dump(daily_report_list, daily_report_list_json)
-                        
-                        await ctx.author.send("Thank you, you've been added to the daily report list.")
+                wallet_address = await bot.wait_for("message", check=check_message_2, timeout = 30) # 30 seconds to reply
             except asyncio.TimeoutError:
-                await ctx.send("Sorry, you either did't reply in time!")
+                await ctx.send("Sorry, you either did't reply with your wallet address or didn't reply in time!")
+                return
             
+            if token == 'all':
+                await calculateAllProfits(ctx, wallet_address.content)
+
+                try:
+                    with open(ROOT_PATH+"/daily_report_list.json", "r") as daily_report_list_json:
+                        daily_report_list = json.load(daily_report_list_json)
+                    
+                    if str(ctx.author.id) not in daily_report_list:
+                        daily_report_list_message = 'Would you like to receive these reports daily [Y/N]?\n'
+                        daily_report_list_message += 'It will require me to save your wallet address so I can automatically send them to you.'
+                        await ctx.author.send(daily_report_list_message)
+
+                        def check_message(msg):
+                            return msg.author == ctx.author and len(msg.content) > 0
+                        
+                        daily_report_list_response = await bot.wait_for("message", check=check_message, timeout = 30) # 30 seconds to reply
+                        acceptable_responses = ['y','Y','yes','Yes']
+                        if daily_report_list_response.content.lower() in acceptable_responses:
+                            daily_report_list[ctx.author.id] = wallet_address.content
+
+                            with open(ROOT_PATH+"/daily_report_list.json", "w") as daily_report_list_json:
+                                json.dump(daily_report_list, daily_report_list_json)
+                            
+                            await ctx.author.send("Thank you, you've been added to the daily report list.")
+                except asyncio.TimeoutError:
+                    await ctx.send("Sorry, you either did't reply in time!")
+                
+                return
+            else:
+                await calculateProfits(ctx, token, wallet_address.content)
+                #@todo give the user the option to pick another token without asking them for their wallet again
+                return
+        except discord.NotFound:
+            return # not sure what to do here...
+        except asyncio.TimeoutError:
+            await ctx.author.send("Sorry, you didn't reply in time!")
+            await message.delete()
             return
-        else:
-            await calculateProfits(ctx, token, wallet_address.content)
-            #@todo give the user the option to pick another token without asking them for their wallet again
+        except Exception as e:
+            #@todo save errors in a log file
+            await ctx.author.send("Sorry, something went wrong, please try again later.")
             return
-    except discord.NotFound:
-        return # not sure what to do here...
-    except asyncio.TimeoutError:
-        await ctx.author.send("Sorry, you didn't reply in time!")
-        await message.delete()
-        return
-    except Exception as e:
-        #@todo save errors in a log file
-        await ctx.author.send("Sorry, something went wrong, please try again later.")
-        return
+    else:
+        await ctx.author.send("You are not authorized to use this bot.")
 
 @bot.command(aliases=['Calculate_manual', 'calc_manual'])
 @commands.dm_only()
 async def calculate_manual(ctx, token, wallet_address):
-    if token in surge_tokens:
-        await calculateProfits(ctx, token, wallet_address)
-        return
+    if checkUserRoles(ctx):
+        if token in surge_tokens:
+            await calculateProfits(ctx, token, wallet_address)
+            return
+        else:
+            await ctx.author.send("That is not a valid Surge token. Please type !list to see available tokens to calculate.")
+            return
     else:
-        await ctx.author.send("That is not a valid Surge token. Please type !list to see available tokens to calculate.")
-        return
+        await ctx.author.send("You are not authorized to use this bot.")
 
 @calculate_manual.error
 async def on_command_error(ctx, error):
@@ -258,6 +280,7 @@ async def help(ctx):
     await ctx.author.send(embed=help_embed)
 
 # start owner commands only
+
 # @bot.command(aliases=['Queue_entries'])
 # @commands.is_owner()
 # @commands.dm_only()
