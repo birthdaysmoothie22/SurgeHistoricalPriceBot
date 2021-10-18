@@ -3,55 +3,59 @@
         "address": "0x14fee7d23233ac941add278c123989b86ea7e1ff",
         "symbol": "USD",
 		"icon": "https://s2.coinmarketcap.com/static/img/coins/64x64/4687.png",
-		"color": "eeb80c",
+		"color": 15644684,
         "fees": {
             "buy": 0.06,
             "sell": 0.06,
             "transfer": 0.02
         },
-        "table_name": "surge_usd"
+        "table_name": "surge_usd",
+		"decimal_display": 2
     },
     "SurgeETH": {
         "address": "0x5b1d1bbdcc432213f83b15214b93dc24d31855ef",
         "symbol": "ETH",
 		"icon": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
-		"color": "818384",
+		"color": 8487812,
         "fees": {
             "buy": 0.06,
             "sell": 0.06,
             "transfer": 0.02
         },
-        "table_name": "surge_eth"
+        "table_name": "surge_eth",
+		"decimal_display": 4
     },
     "SurgeBTC": {
         "address": "0xb68c9d9bd82bdf4eeecb22caa7f3ab94393108a1",
         "symbol": "BTC",
 		"icon": "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
-		"color": "F7931A",
+		"color": 16225050,
         "fees": {
             "buy": 0.06,
             "sell": 0.06,
             "transfer": 0.03
         },
-        "table_name": "surge_btc"
+        "table_name": "surge_btc",
+		"decimal_display": 4
     },
     "SurgeADA": {
         "address": "0xbf6bb9b8004942dfb3c1cde3cb950af78ab8a5af",
         "symbol": "ADA",
 		"icon": "https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png",
-		"color": "0133AE",
+		"color": 78766,
         "fees": {
             "buy": 0.04,
             "sell": 0.04,
             "transfer": 0.02
         },
-        "table_name": "surge_ada"
+        "table_name": "surge_ada",
+		"decimal_display": 4
     },
     "SurgeUSLS": {
         "address": "0x2e62e57d1d36517d4b0f329490ac1b78139967c0",
         "symbol": "USELESS",
 		"icon": "https://s2.coinmarketcap.com/static/img/coins/64x64/10851.png",
-		"color": "EAB729",
+		"color": 15382313,
         "fees": {
             "buy": 0.08,
             "sell": 0.08,
@@ -60,6 +64,7 @@
         },
         "allows_staking": true,
         "underlying_asset_sell_fee": 0.08,
-        "table_name": "surge_useless"
+        "table_name": "surge_useless",
+		"decimal_display": 12
     }
   }

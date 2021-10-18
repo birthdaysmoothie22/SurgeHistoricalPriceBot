@@ -149,7 +149,7 @@ def calculateSurgeProfits(wallet_address, surge_token):
             elif tx_type == 'received':
                 tokens_inbound += surge_token_amount
             
-        result[token]['total_underlying_asset_value_purchased'] = "{:,.9f}".format(total_underlying_asset_value_purchased)
+        result[token]['total_underlying_asset_value_purchased'] = "{:,.5f}".format(total_underlying_asset_value_purchased)
         result[token]['total_underlying_asset_amount_purchased'] = '$'+"{:,.2f}".format(total_underlying_asset_amount_purchased)
         result[token]['total_underlying_asset_amount_received'] = '$'+"{:,.2f}".format(total_underlying_asset_amount_received)
 
@@ -161,15 +161,19 @@ def calculateSurgeProfits(wallet_address, surge_token):
             myresult = mycursor.fetchall()
 
             current_token_value_data = json.loads(myresult[0][2])
+            current_token_value_data['token_value'] = float(current_token_value_data['token_value'])
+            current_token_value_data['underlying_asset_value'] = float(current_token_value_data['underlying_asset_value'])
 
             remaining_tokens_after_sell_fee = remaining_tokens-(remaining_tokens * fees['sell'])
 
-            current_value_of_surge_underlying_asset = remaining_tokens_after_sell_fee * float(current_token_value_data['token_value'])
-            current_underlying_asset_value = current_value_of_surge_underlying_asset * float(current_token_value_data['underlying_asset_value'])
+            current_value_of_surge_underlying_asset = remaining_tokens_after_sell_fee * current_token_value_data['token_value']
+            current_underlying_asset_value = current_value_of_surge_underlying_asset * current_token_value_data['underlying_asset_value']
 
             current_underlying_asset_value = current_underlying_asset_value
-        
-        result[token]['current_underlying_asset_amount'] = "{:,.9f}".format(current_value_of_surge_underlying_asset)
+
+        decimal_display = str(surge_tokens[token]['decimal_display'])
+        result[token]['current_underlying_asset_price'] = "{:,.{decimal_display}f}".format(current_token_value_data['underlying_asset_value'], decimal_display=decimal_display)
+        result[token]['current_underlying_asset_amount'] = "{:,.5f}".format(current_value_of_surge_underlying_asset)
         result[token]['current_underlying_asset_value'] = '$'+"{:,.2f}".format(current_underlying_asset_value)
 
         overall_profit_or_loss = (current_underlying_asset_value + total_underlying_asset_amount_received) - total_underlying_asset_amount_purchased

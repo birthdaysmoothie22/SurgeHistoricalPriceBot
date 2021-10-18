@@ -28,18 +28,22 @@ def createCalcResultEmbedMessage(token, result):
     embed = discord.Embed(
         title="Surge "+surge_tokens[token]['symbol']+" Details",
         description="", 
-        color=0x22B4AB)
+        color=surge_tokens[token]['color'])
     embed.set_thumbnail(url=surge_tokens[token]['icon'])
     embed.add_field(name="Total Amount Bought in USD", value=data[token]['total_underlying_asset_amount_purchased'], inline=False)
     if token != 'SurgeUSD':
         embed.add_field(name="Total Amount Bought in "+surge_tokens[token]['symbol'], value=data[token]['total_underlying_asset_value_purchased'], inline=False)
     embed.add_field(name="Total Amount Sold in USD", value=data[token]['total_underlying_asset_amount_received'], inline=False)
-    embed.add_field(name="Current Value of Surge After Sell Fee in USD", value=data[token]['current_underlying_asset_value'], inline=False)
+    embed.add_field(name="Current Value After Sell Fee in USD", value=data[token]['current_underlying_asset_value'], inline=False)
     if token != 'SurgeUSD':
-        embed.add_field(name="Current Value of Surge After Sell Fee in "+surge_tokens[token]['symbol'], value=data[token]['current_underlying_asset_amount'], inline=False)
+        embed.add_field(name="Current Value After Sell Fee in "+surge_tokens[token]['symbol'], value=data[token]['current_underlying_asset_amount'], inline=False)
+        embed.add_field(name="Current "+surge_tokens[token]['symbol']+" Price:", value=data[token]['current_underlying_asset_price'], inline=False)
     embed.add_field(name="Overall +/- Profit in USD", value=data[token]['overall_profit_or_loss'], inline=False)
     
-    embed_disclaimer_text = "This bot gives you a close approximation of your overall accrual of Surge Token value. This is accomplished by pulling buyer transaction history and tracking historical price data on both the Surge Token and it's backing asset. Due to volatility of the backing asset, the price average between milliseconds of every transaction is used to attain the historical value. Because of this, the reflected value may not be 100% accurate. Estimated accuracy is estimated to be within 90-100%. \n\nPlease contact birthdaysmoothie#9602 if you have any question, issues, or data-related concerns."
+    embed_disclaimer_text = "This bot gives you a close approximation of your overall accrual of Surge Token value. This is accomplished by pulling buyer transaction history and tracking historical price data on both the Surge Token and it's backing asset. Due to volatility of the backing asset, the price average between milliseconds of every transaction is used to attain the historical value. Because of this, the reflected value may not be 100% accurate. Estimated accuracy is estimated to be within 90-100%."
+    embed_disclaimer_text +="\n\nPlease contact birthdaysmoothie#9602 if you have any question, issues, or data-related concerns."
+    embed_disclaimer_text +="\n\nPricing data powered by Binance and Coingecko APIs."
+    embed_disclaimer_text +="\nTransaction data powered by BscScan APIs"
     embed.set_footer(text=embed_disclaimer_text)
 
     return embed
@@ -87,6 +91,8 @@ async def calculateAllProfits(ctx, wallet_address):
         result = surge_profit_tracker.calculateSurgeProfits(wallet_address, token)
         embed = createCalcResultEmbedMessage(token, result)
         await ctx.author.send(embed=embed)
+    
+    await ctx.author.send("All your reports are complete.")
     return
  
 
