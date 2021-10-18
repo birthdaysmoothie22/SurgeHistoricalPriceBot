@@ -164,28 +164,26 @@ async def calculate(ctx):
         if token == 'all':
             await calculateAllProfits(ctx, wallet_address.content)
 
-            daily_report_list_message = 'Would you like to receive these reports daily [Y/N]?\n'
-            daily_report_list_message += 'It will require me to save your wallet address so I can automatically send them to you.'
-            await ctx.author.send(daily_report_list_message)
-
-            def check_message(msg):
-                return msg.author == ctx.author and len(msg.content) > 0
-
             try:
-                daily_report_list_response = await bot.wait_for("message", check=check_message, timeout = 30) # 30 seconds to reply
-                if daily_report_list_response.content.lower() == 'y':
-                    with open(ROOT_PATH+"/daily_report_list.json", "r") as daily_report_list_json:
-                        daily_report_list = json.load(daily_report_list_json)
+                with open(ROOT_PATH+"/daily_report_list.json", "r") as daily_report_list_json:
+                    daily_report_list = json.load(daily_report_list_json)
+                
+                if str(ctx.author.id) not in daily_report_list:
+                    daily_report_list_message = 'Would you like to receive these reports daily [Y/N]?\n'
+                    daily_report_list_message += 'It will require me to save your wallet address so I can automatically send them to you.'
+                    await ctx.author.send(daily_report_list_message)
 
-                    if str(ctx.author.id) not in daily_report_list:
+                    def check_message(msg):
+                        return msg.author == ctx.author and len(msg.content) > 0
+                    
+                    daily_report_list_response = await bot.wait_for("message", check=check_message, timeout = 30) # 30 seconds to reply
+                    if daily_report_list_response.content.lower() == 'y':
                         daily_report_list[ctx.author.id] = wallet_address.content
 
                         with open(ROOT_PATH+"/daily_report_list.json", "w") as daily_report_list_json:
                             json.dump(daily_report_list, daily_report_list_json)
                         
                         await ctx.author.send("Thank you, you've been added to the daily report list.")
-                    else:
-                        await ctx.author.send("You are already on the daily report list.")
             except asyncio.TimeoutError:
                 await ctx.send("Sorry, you either did't reply in time!")
             
