@@ -177,7 +177,8 @@ async def calculate(ctx):
                         return msg.author == ctx.author and len(msg.content) > 0
                     
                     daily_report_list_response = await bot.wait_for("message", check=check_message, timeout = 30) # 30 seconds to reply
-                    if daily_report_list_response.content.lower() == 'y':
+                    acceptable_responses = ['y','Y','yes','Yes']
+                    if daily_report_list_response.content.lower() in acceptable_responses:
                         daily_report_list[ctx.author.id] = wallet_address.content
 
                         with open(ROOT_PATH+"/daily_report_list.json", "w") as daily_report_list_json:

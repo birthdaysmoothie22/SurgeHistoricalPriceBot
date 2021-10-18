@@ -66,14 +66,15 @@ client = discord.Client(intents=intents)
 @client.event
 async def on_ready():
     owner = client.get_user(OWNER_DISCORD_ID)
-    await owner.send("Running daily reports now")
-
     with open(ROOT_PATH+"/daily_report_list.json", "r") as daily_report_list_json:
         daily_report_list = json.load(daily_report_list_json)
+
+    await owner.send("Running daily reports now - sending to "+len(daily_report_list)+" users")
 
     for user_id in daily_report_list:
         user = client.get_user(int(user_id))
         await calculateAllProfits(user, daily_report_list[user_id])
+        time.sleep(1)
 
     await owner.send("Daily reports all sent")
     exit()
