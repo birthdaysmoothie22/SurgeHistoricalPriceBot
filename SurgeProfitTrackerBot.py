@@ -57,7 +57,7 @@ def createCustomHelpEmbedMessage():
     embed.add_field(name="calculate, calc", value="Calculates your overall Surge Token value.  Requires you to pick a token and provide your public wallet address.", inline=False)
     embed.add_field(name="calculate_manual, calc_manual", value="Calculates your overall Surge Token value.  You must provide the token you wish to caluclate and your public wallet address.  Example: !calculate_manual SurgeADA 0x00a...", inline=False)
     embed.add_field(name="list", value="View available tokens to choose from.", inline=False)
-    embed.add_field(name="queue", value="View how many people are queued up to calculate profits.", inline=False)
+    #embed.add_field(name="queue", value="View how many people are queued up to calculate profits.", inline=False)
 
     return embed
 
@@ -79,14 +79,14 @@ def createCustomHelpEmbedMessage():
 #         return
 
 async def calculateProfits(ctx, token, wallet_address):
-    await ctx.author.send("I'm calculating your profits now")
+    await ctx.author.send("I'm creating your report now:")
     result = surge_profit_tracker.calculateSurgeProfits(wallet_address, token)
     embed = createCalcResultEmbedMessage(token, result)
     await ctx.author.send(embed=embed)
     return
 
 async def calculateAllProfits(ctx, wallet_address):
-    await ctx.author.send("I'm calculating your profits now")
+    await ctx.author.send("I'm creating your reports now:")
     for token in surge_tokens:
         result = surge_profit_tracker.calculateSurgeProfits(wallet_address, token)
         embed = createCalcResultEmbedMessage(token, result)
@@ -94,7 +94,6 @@ async def calculateAllProfits(ctx, wallet_address):
     
     await ctx.author.send("All your reports are complete.")
     return
- 
 
 bot = commands.Bot(command_prefix='', owner_id=OWNER_DISCORD_ID, help_command=None)
 
@@ -163,20 +162,46 @@ async def calculate(ctx):
         
         if token == 'all':
             await calculateAllProfits(ctx, wallet_address.content)
-            #@todo give the user the option to receive this daily?
-            #would have to store discord id with wallet address
-            #have a cron that pulls the data daily and sends out an embed 
+
+            daily_report_list_message = 'Would you like to receive these reports daily [Y/N]?\n'
+            daily_report_list_message += 'It will require me to save your wallet address so I can automatically send them to you.'
+            await ctx.author.send(daily_report_list_message)
+
+            def check_message(msg):
+                return msg.author == ctx.author and len(msg.content) > 0
+
+            try:
+                daily_report_list_response = await bot.wait_for("message", check=check_message, timeout = 30) # 30 seconds to reply
+                if daily_report_list_response.content.lower() == 'y':
+                    with open(ROOT_PATH+"/daily_report_list.json", "r") as daily_report_list_json:
+                        daily_report_list = json.load(daily_report_list_json)
+
+                    if str(ctx.author.id) not in daily_report_list:
+                        daily_report_list[ctx.author.id] = wallet_address.content
+
+                        with open(ROOT_PATH+"/daily_report_list.json", "w") as daily_report_list_json:
+                            json.dump(daily_report_list, daily_report_list_json)
+                        
+                        await ctx.author.send("Thank you, you've been added to the daily report list.")
+                    else:
+                        await ctx.author.send("You are already on the daily report list.")
+            except asyncio.TimeoutError:
+                await ctx.send("Sorry, you either did't reply in time!")
+            
             return
         else:
             await calculateProfits(ctx, token, wallet_address.content)
             #@todo give the user the option to pick another token without asking them for their wallet again
             return
-        
     except discord.NotFound:
         return # not sure what to do here...
     except asyncio.TimeoutError:
-        await ctx.send("Sorry, you didn't reply in time!")
+        await ctx.author.send("Sorry, you didn't reply in time!")
         await message.delete()
+        return
+    except Exception as e:
+        #@todo save errors in a log file
+        await ctx.author.send("Sorry, something went wrong, please try again later.")
         return
 
 @bot.command(aliases=['Calculate_manual', 'calc_manual'])
@@ -199,6 +224,7 @@ async def on_command_error(ctx, error):
 # async def queue(ctx):
 #     tracker_queue = surge_profit_tracker_queue.checkQueueCount()
 #     await ctx.author.send("There are "+str(tracker_queue)+" people in the profit tracker queue")
+    
 
 @bot.command(aliases=['List'])
 @commands.dm_only()
