@@ -57,6 +57,7 @@ def createCustomHelpEmbedMessage():
     embed.add_field(name="calculate, calc", value="Calculates your overall Surge Token value.  Requires you to pick a token and provide your public wallet address.", inline=False)
     embed.add_field(name="calculate_manual, calc_manual", value="Calculates your overall Surge Token value.  You must provide the token you wish to caluclate and your public wallet address.  Example: !calculate_manual SurgeADA 0x00a...", inline=False)
     embed.add_field(name="list", value="View available tokens to choose from.", inline=False)
+    embed.add_field(name="remove_daily", value="Be removed from the daily report list.", inline=False)
     #embed.add_field(name="queue", value="View how many people are queued up to calculate profits.", inline=False)
 
     return embed
@@ -224,7 +225,23 @@ async def on_command_error(ctx, error):
 # async def queue(ctx):
 #     tracker_queue = surge_profit_tracker_queue.checkQueueCount()
 #     await ctx.author.send("There are "+str(tracker_queue)+" people in the profit tracker queue")
+
+@bot.command(aliases=['Remove_daily'])
+@commands.dm_only()
+async def remove_daily(ctx):
+    with open(ROOT_PATH+"/daily_report_list.json", "r") as daily_report_list_json:
+        daily_report_list = json.load(daily_report_list_json)
     
+    if str(ctx.author.id) in daily_report_list:
+        daily_report_list.pop(str(ctx.author.id))
+        with open(ROOT_PATH+"/daily_report_list.json", "w") as daily_report_list_json:
+            json.dump(daily_report_list, daily_report_list_json)
+
+        await ctx.author.send("You have been removed from the daily report.")
+    else:
+        await ctx.author.send("You are not in the daily report list.")
+
+    return
 
 @bot.command(aliases=['List'])
 @commands.dm_only()
