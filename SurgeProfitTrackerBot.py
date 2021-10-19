@@ -23,28 +23,30 @@ with open(ROOT_PATH+"/surge_tokens.json", "r") as surge_tokens_json:
     surge_tokens = json.load(surge_tokens_json)
 
 def createCalcResultEmbedMessage(token, result):
-    data = json.loads(result)
+    embed = False
 
-    embed = discord.Embed(
-        title="Surge "+surge_tokens[token]['symbol']+" Details",
-        description="", 
-        color=surge_tokens[token]['color'])
-    embed.set_thumbnail(url=surge_tokens[token]['icon'])
-    embed.add_field(name="Total Amount Bought in USD", value=data[token]['total_underlying_asset_amount_purchased'], inline=False)
-    if token != 'SurgeUSD':
-        embed.add_field(name="Total Amount Bought in "+surge_tokens[token]['symbol'], value=data[token]['total_underlying_asset_value_purchased'], inline=False)
-    embed.add_field(name="Total Amount Sold in USD", value=data[token]['total_underlying_asset_amount_received'], inline=False)
-    embed.add_field(name="Current Value After Sell Fee in USD", value=data[token]['current_underlying_asset_value'], inline=False)
-    if token != 'SurgeUSD':
-        embed.add_field(name="Current Value After Sell Fee in "+surge_tokens[token]['symbol'], value=data[token]['current_underlying_asset_amount'], inline=False)
-        embed.add_field(name="Current "+surge_tokens[token]['symbol']+" Price:", value=data[token]['current_underlying_asset_price'], inline=False)
-    embed.add_field(name="Overall +/- Profit in USD", value=data[token]['overall_profit_or_loss'], inline=False)
-    
-    embed_disclaimer_text = "This bot gives you a close approximation of your overall accrual of Surge Token value. This is accomplished by pulling buyer transaction history and tracking historical price data on both the Surge Token and it's backing asset. Due to volatility of the backing asset, the price average between milliseconds of every transaction is used to attain the historical value. Because of this, the reflected value may not be 100% accurate. Estimated accuracy is estimated to be within 90-100%."
-    embed_disclaimer_text +="\n\nPlease contact birthdaysmoothie#9602 if you have any question, issues, or data-related concerns."
-    embed_disclaimer_text +="\n\nPricing data powered by Binance and Coingecko APIs."
-    embed_disclaimer_text +="\nTransaction data powered by BscScan APIs"
-    embed.set_footer(text=embed_disclaimer_text)
+    data = json.loads(result)
+    if len(data[token]) > 0:
+        embed = discord.Embed(
+            title="Surge "+surge_tokens[token]['symbol']+" Details",
+            description="", 
+            color=surge_tokens[token]['color'])
+        embed.set_thumbnail(url=surge_tokens[token]['icon'])
+        embed.add_field(name="Total Amount Bought in USD", value=data[token]['total_underlying_asset_amount_purchased'], inline=False)
+        if token != 'SurgeUSD':
+            embed.add_field(name="Total Amount Bought in "+surge_tokens[token]['symbol'], value=data[token]['total_underlying_asset_value_purchased'], inline=False)
+        embed.add_field(name="Total Amount Sold in USD", value=data[token]['total_underlying_asset_amount_received'], inline=False)
+        embed.add_field(name="Current Value After Sell Fee in USD", value=data[token]['current_underlying_asset_value'], inline=False)
+        if token != 'SurgeUSD':
+            embed.add_field(name="Current Value After Sell Fee in "+surge_tokens[token]['symbol'], value=data[token]['current_underlying_asset_amount'], inline=False)
+            embed.add_field(name="Current "+surge_tokens[token]['symbol']+" Price:", value=data[token]['current_underlying_asset_price'], inline=False)
+        embed.add_field(name="Overall +/- Profit in USD", value=data[token]['overall_profit_or_loss'], inline=False)
+        
+        embed_disclaimer_text = "This bot gives you a close approximation of your overall accrual of Surge Token value. This is accomplished by pulling buyer transaction history and tracking historical price data on both the Surge Token and it's backing asset. Due to volatility of the backing asset, the price average between milliseconds of every transaction is used to attain the historical value. Because of this, the reflected value may not be 100% accurate. Estimated accuracy is estimated to be within 90-100%."
+        embed_disclaimer_text +="\n\nPlease contact birthdaysmoothie#9602 if you have any question, issues, or data-related concerns."
+        embed_disclaimer_text +="\n\nPricing data powered by Binance and Coingecko APIs."
+        embed_disclaimer_text +="\nTransaction data powered by BscScan APIs"
+        embed.set_footer(text=embed_disclaimer_text)
 
     return embed
 
@@ -58,7 +60,6 @@ def createCustomHelpEmbedMessage():
     embed.add_field(name="calculate_manual, calc_manual", value="Calculates your overall Surge Token value.  You must provide the token you wish to caluclate and your public wallet address.  Example: !calculate_manual SurgeADA 0x00a...", inline=False)
     embed.add_field(name="list", value="View available tokens to choose from.", inline=False)
     embed.add_field(name="remove_daily", value="Be removed from the daily report list.", inline=False)
-    #embed.add_field(name="queue", value="View how many people are queued up to calculate profits.", inline=False)
 
     return embed
 
@@ -84,10 +85,23 @@ def checkUserRoles(ctx):
     # This is the xSurge server guild
     guild = bot.get_guild(870722243750141972)
     member = guild.get_member(ctx.author.id)
-    acceptable_roles = ['community manager','senior mod','discord mod','telegram mod','facebook mod','instagram community manager','project management','marketing manager','social media developer','dev team',]
+    acceptable_roles = [
+        871808913991934033, #community manager
+        870805348880117841, #senior mod
+        870732883378204762, #discord mod
+        870732957214711898, #telegram mod
+        870733002525778011, #reddit mod
+        870733039607623750, #facebook mod
+        871946533308870737, #instagram community manager
+        871825421438709812, #project management
+        871825843901595698, #marketing manager
+        889579266583462038, #social media developer
+        872321281922580501, #dev team
+        875023712578052138 #vip
+    ]
     if member != None:
         for role in member.roles:
-            if str(role).lower() in acceptable_roles:
+            if role.id in acceptable_roles:
                 access_allowed = True
 
     return access_allowed
@@ -96,8 +110,12 @@ def checkUserRoles(ctx):
 async def calculateProfits(ctx, token, wallet_address):
     await ctx.author.send("I'm creating your report now:")
     result = surge_profit_tracker.calculateSurgeProfits(wallet_address, token)
+    print(result)
     embed = createCalcResultEmbedMessage(token, result)
-    await ctx.author.send(embed=embed)
+    if embed != False:
+        await ctx.author.send(embed=embed)
+    else: 
+        await ctx.author.send("No transaction data for "+token)
     return
 
 async def calculateAllProfits(ctx, wallet_address):
@@ -105,7 +123,8 @@ async def calculateAllProfits(ctx, wallet_address):
     for token in surge_tokens:
         result = surge_profit_tracker.calculateSurgeProfits(wallet_address, token)
         embed = createCalcResultEmbedMessage(token, result)
-        await ctx.author.send(embed=embed)
+        if embed != False:
+            await ctx.author.send(embed=embed)
     
     await ctx.author.send("All your reports are complete.")
     return
@@ -216,10 +235,11 @@ async def calculate(ctx):
             await ctx.author.send("Sorry, you didn't reply in time!")
             await message.delete()
             return
-        except Exception as e:
-            #@todo save errors in a log file
-            await ctx.author.send("Sorry, something went wrong, please try again later.")
-            return
+        # except Exception as e:
+        #     print(e)
+        #     #@todo save errors in a log file
+        #     await ctx.author.send("Sorry, something went wrong, please try again later.")
+        #     return
     else:
         await ctx.author.send("You are not authorized to use this bot.")
 
