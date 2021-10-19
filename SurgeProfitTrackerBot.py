@@ -110,7 +110,6 @@ def checkUserRoles(ctx):
 async def calculateProfits(ctx, token, wallet_address):
     await ctx.author.send("I'm creating your report now:")
     result = surge_profit_tracker.calculateSurgeProfits(wallet_address, token)
-    print(result)
     embed = createCalcResultEmbedMessage(token, result)
     if embed != False:
         await ctx.author.send(embed=embed)
@@ -235,11 +234,10 @@ async def calculate(ctx):
             await ctx.author.send("Sorry, you didn't reply in time!")
             await message.delete()
             return
-        # except Exception as e:
-        #     print(e)
-        #     #@todo save errors in a log file
-        #     await ctx.author.send("Sorry, something went wrong, please try again later.")
-        #     return
+        except Exception as e:
+            #@todo save errors in a log file
+            await ctx.author.send("Sorry, something went wrong, please try again later.")
+            return
     else:
         await ctx.author.send("You are not authorized to use this bot.")
 
