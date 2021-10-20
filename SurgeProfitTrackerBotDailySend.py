@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 import time
 import datetime
 from discord.client import Client
@@ -18,6 +19,10 @@ load_dotenv()
 ROOT_PATH = os.getenv('ROOT_PATH')
 SURGE_PROFIT_TRACKER_BOT_KEY = os.getenv('SURGE_PROFIT_TRACKER_BOT_KEY')
 OWNER_DISCORD_ID = int(os.getenv('OWNER_DISCORD_ID'))
+
+logging.basicConfig(filename=ROOT_PATH+"/error_log_daily_send.log",
+    format='%(levelname)s %(asctime)s :: %(message)s',
+    level=logging.WARNING)
 
 with open(ROOT_PATH+"/surge_tokens.json", "r") as surge_tokens_json:
     surge_tokens = json.load(surge_tokens_json)

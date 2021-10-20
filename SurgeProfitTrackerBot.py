@@ -86,6 +86,7 @@ def createCustomHelpEmbedMessage():
 #         return
 
 def checkUserRoles(ctx):
+    return True
     access_allowed = False
     # This is the xSurge server guild
     guild = bot.get_guild(870722243750141972)
