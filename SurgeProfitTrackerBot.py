@@ -189,7 +189,7 @@ async def calculate(ctx):
             # Delete the original drop down so the user can't interact with it again
             await message.delete()
 
-            message_2 = 'Please tell me your wallet address\n'
+            message_2 = 'Please enter your public BEP-20 wallet address:\n'
             await ctx.author.send(message_2)
 
             def check_message_2(msg):
