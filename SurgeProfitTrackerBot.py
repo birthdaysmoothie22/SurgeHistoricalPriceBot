@@ -80,6 +80,13 @@ def createCustomHelpEmbedMessage():
 #         await ctx.author.send("There are too many people requesting right now, please try again leter.  You can check the queue count at anytime by typing in !queue")
 #         return
 
+def addErrorToLog(error, wallet_address):
+    with open(ROOT_PATH+"/error_log.json", "w") as error_log_json:
+        error_log = json.load(error_log_json)
+        error_log_msg = wallet_address+" : "+str(error)
+        error_log.append(error_log_msg)
+        json.dump(error_log, error_log_json)
+
 def checkUserRoles(ctx):
     access_allowed = False
     # This is the xSurge server guild
@@ -105,7 +112,6 @@ def checkUserRoles(ctx):
                 access_allowed = True
 
     return access_allowed
-
 
 async def calculateProfits(ctx, token, wallet_address):
     await ctx.author.send("I'm creating your report now:")
@@ -235,7 +241,7 @@ async def calculate(ctx):
             await message.delete()
             return
         except Exception as e:
-            #@todo save errors in a log file
+            #addErrorToLog(e, wallet_address.content)
             await ctx.author.send("Sorry, something went wrong, please try again later.")
             return
     else:

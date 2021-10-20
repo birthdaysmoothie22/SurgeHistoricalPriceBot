@@ -100,7 +100,7 @@ def calculateSurgeProfits(wallet_address, surge_token):
                 token_value_data_json = json.loads(row[2])
                 token_value_data[timestamp].append(float(token_value_data_json['token_value']))
                 underlying_asset_value_data[timestamp].append(float(token_value_data_json['underlying_asset_value']))
-
+                
         for tx in surge_transactions[token]['txs']:
             
             tx_timestamp = int(tx['timeStamp'])
@@ -191,5 +191,3 @@ def calculateSurgeProfits(wallet_address, surge_token):
     mydb.close()
     
     return json.dumps(result)
-
-print(calculateSurgeProfits("0x4aadb4A197E07291D8e19Dba17D9ceb327af7Bbb","SurgeUSD"))
