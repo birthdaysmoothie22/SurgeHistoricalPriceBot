@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 import time
 import datetime
 from discord.client import Client
@@ -18,6 +19,10 @@ load_dotenv()
 ROOT_PATH = os.getenv('ROOT_PATH')
 SURGE_PROFIT_TRACKER_BOT_KEY = os.getenv('SURGE_PROFIT_TRACKER_BOT_KEY')
 OWNER_DISCORD_ID = int(os.getenv('OWNER_DISCORD_ID'))
+
+logging.basicConfig(filename=ROOT_PATH+"/error_log.log",
+    format='%(levelname)s %(asctime)s :: %(message)s',
+    level=logging.ERROR)
 
 with open(ROOT_PATH+"/surge_tokens.json", "r") as surge_tokens_json:
     surge_tokens = json.load(surge_tokens_json)
@@ -79,13 +84,6 @@ def createCustomHelpEmbedMessage():
 #     else:
 #         await ctx.author.send("There are too many people requesting right now, please try again leter.  You can check the queue count at anytime by typing in !queue")
 #         return
-
-def addErrorToLog(error, wallet_address):
-    with open(ROOT_PATH+"/error_log.json", "w") as error_log_json:
-        error_log = json.load(error_log_json)
-        error_log_msg = wallet_address+" : "+str(error)
-        error_log.append(error_log_msg)
-        json.dump(error_log, error_log_json)
 
 def checkUserRoles(ctx):
     access_allowed = False
@@ -199,7 +197,7 @@ async def calculate(ctx):
             try:
                 wallet_address = await bot.wait_for("message", check=check_message_2, timeout = 30) # 30 seconds to reply
             except asyncio.TimeoutError:
-                await ctx.send("Sorry, you either did't reply with your wallet address or didn't reply in time!")
+                await ctx.send("Sorry, you either didn't reply with your wallet address or didn't reply in time!")
                 return
             
             if token == 'all':
@@ -227,7 +225,7 @@ async def calculate(ctx):
                             
                             await ctx.author.send("Thank you, you've been added to the daily report list.")
                 except asyncio.TimeoutError:
-                    await ctx.send("Sorry, you either did't reply in time!")
+                    await ctx.send("Sorry, you didn't reply in time!")
                 
                 return
             else:
@@ -242,6 +240,8 @@ async def calculate(ctx):
             return
         except Exception as e:
             #addErrorToLog(e, wallet_address.content)
+            err_msg = str(e)+" : "+wallet_address.content
+            logging.error(err_msg)
             await ctx.author.send("Sorry, something went wrong, please try again later.")
             return
     else:

@@ -130,4 +130,4 @@ dmypy.json
 
 # Specific Files
 daily_report_list.json
-error_log.json
+error_log.log
