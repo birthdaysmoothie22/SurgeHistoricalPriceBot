@@ -50,6 +50,9 @@ def calculateSurgeProfits(wallet_address, surge_token):
     for token in surge_transactions:
         result[token] = {}
 
+        if len(surge_transactions[token]['txs']) <= 0:
+            return json.dumps(result)
+
         fees = surge_tokens[token]['fees'] 
 
         tokens_inbound = 0
