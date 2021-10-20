@@ -45,7 +45,7 @@ def calculateSurgeProfits(wallet_address, surge_token):
     else:
         surge_transactions_json = surge_get_wallet_transactions.fetch_transactions(wallet_address, surge_token)
         surge_transactions = json.loads(surge_transactions_json)
-
+        
     result = {}
     for token in surge_transactions:
         result[token] = {}
@@ -152,9 +152,12 @@ def calculateSurgeProfits(wallet_address, surge_token):
         result[token]['total_underlying_asset_value_purchased'] = "{:,.5f}".format(total_underlying_asset_value_purchased)
         result[token]['total_underlying_asset_amount_purchased'] = '$'+"{:,.2f}".format(total_underlying_asset_amount_purchased)
         result[token]['total_underlying_asset_amount_received'] = '$'+"{:,.2f}".format(total_underlying_asset_amount_received)
-
+        
         remaining_tokens = tokens_inbound - tokens_outbound
         current_underlying_asset_value = 0
+        current_value_of_surge_underlying_asset = 0
+        current_underlying_asset_value = 0
+
         if remaining_tokens > 0:
             sql = "SELECT * FROM `"+db_table_name+"_values` WHERE 1 ORDER BY `id` DESC LIMIT 1"
             mycursor.execute(sql)
@@ -170,6 +173,8 @@ def calculateSurgeProfits(wallet_address, surge_token):
             current_underlying_asset_value = current_value_of_surge_underlying_asset * current_token_value_data['underlying_asset_value']
 
             current_underlying_asset_value = current_underlying_asset_value
+        else:
+            current_token_value_data = {"underlying_asset_value": 0, "token_value": 0}
 
         decimal_display = str(surge_tokens[token]['decimal_display'])
         result[token]['current_underlying_asset_price'] = "{:,.{decimal_display}f}".format(current_token_value_data['underlying_asset_value'], decimal_display=decimal_display)
@@ -183,3 +188,5 @@ def calculateSurgeProfits(wallet_address, surge_token):
     mydb.close()
     
     return json.dumps(result)
+
+print(calculateSurgeProfits("0x4aadb4A197E07291D8e19Dba17D9ceb327af7Bbb","SurgeUSD"))
