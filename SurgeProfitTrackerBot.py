@@ -78,7 +78,7 @@ async def sendDailyReport(bot):
 
 	for user_id in daily_report_list:
 		user = await bot.fetch_user(int(user_id))
-		#await calculateAllProfits(user, daily_report_list[user_id])
+		await calculateAllProfits(user, daily_report_list[user_id])
 		logging.info('report sent to '+user_id)
 		await asyncio.sleep(2)
 
