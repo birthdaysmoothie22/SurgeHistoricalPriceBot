@@ -82,10 +82,14 @@ async def on_ready():
 
 	for user_id in daily_report_list:
 		user = client.get_user(int(user_id))
-		await calculateAllProfits(user, daily_report_list[user_id])
-		logging.info('report sent to '+user_id)
-		time.sleep(1)
-
+		try:
+			await calculateAllProfits(user, daily_report_list[user_id])
+			logging.info('report sent to '+user_id)
+			time.sleep(2)
+		except Exception as e:
+			err_msg = str(e)+" : "+user_id+" : "+daily_report_list[user_id]
+			logging.error(err_msg)
+			
 	logging.info("Daily reports all sent")
 	await owner.send("Daily reports all sent")
 	exit()

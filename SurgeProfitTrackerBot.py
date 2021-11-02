@@ -399,6 +399,6 @@ async def before():
 	
 	return True
 
-checkSendDailyDate.start()
+#checkSendDailyDate.start()
 
 bot.run(SURGE_PROFIT_TRACKER_BOT_KEY)
