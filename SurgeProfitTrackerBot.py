@@ -218,6 +218,8 @@ async def calculate(ctx):
 				await ctx.send("Sorry, you either didn't reply with your wallet address or didn't reply in time!")
 				return
 			
+			logging.info(ctx.author.id+' has requested a report')
+
 			if token == 'all':
 				await calculateAllProfits(ctx, wallet_address.content)
 
