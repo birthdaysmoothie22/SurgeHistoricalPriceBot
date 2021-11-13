@@ -38,11 +38,11 @@ def createCalcResultEmbedMessage(token, result):
 			color=surge_tokens[token]['color'])
 		embed.set_thumbnail(url=surge_tokens[token]['icon'])
 		embed.add_field(name="**Total Amount Bought in USD**", value=data[token]['total_underlying_asset_amount_purchased'], inline=False)
-		if token != 'SurgeUSD':
+		if token != 'SurgeUSD' and token != 'SurgeXUSD':
 			embed.add_field(name="**Total Amount Bought in "+surge_tokens[token]['symbol']+"**", value=data[token]['total_underlying_asset_value_purchased'], inline=False)
 		embed.add_field(name="**Total Amount Sold in USD**", value=data[token]['total_underlying_asset_amount_received'], inline=False)
 		embed.add_field(name="**Current Value After Sell Fee in USD**", value=data[token]['current_underlying_asset_value'], inline=False)
-		if token != 'SurgeUSD':
+		if token != 'SurgeUSD' and token != 'SurgeXUSD':
 			embed.add_field(name="**Current Value After Sell Fee in "+surge_tokens[token]['symbol']+"**", value=data[token]['current_underlying_asset_amount'], inline=False)
 			embed.add_field(name="**Current "+surge_tokens[token]['symbol']+" Price:**", value=data[token]['current_underlying_asset_price'], inline=False)
 		embed.add_field(name="**Overall +/- Profit in USD**", value=data[token]['overall_profit_or_loss'], inline=False)
@@ -191,6 +191,10 @@ async def calculate(ctx):
 							label="SurgeUSLS", 
 							value="SurgeUSLS"
 						),
+						SelectOption(
+							label="SurgeXUSD", 
+							value="SurgeXUSD"
+						)
 					]
 				)
 			]
