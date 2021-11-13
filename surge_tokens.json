@@ -10,7 +10,8 @@
             "transfer": 0.02
         },
         "table_name": "surge_usd",
-		"decimal_display": 2
+		"decimal_display": 2,
+		"decimals": 0
     },
     "SurgeETH": {
         "address": "0x5b1d1bbdcc432213f83b15214b93dc24d31855ef",
@@ -23,7 +24,8 @@
             "transfer": 0.02
         },
         "table_name": "surge_eth",
-		"decimal_display": 4
+		"decimal_display": 4,
+		"decimals": 0
     },
     "SurgeBTC": {
         "address": "0xb68c9d9bd82bdf4eeecb22caa7f3ab94393108a1",
@@ -36,7 +38,8 @@
             "transfer": 0.03
         },
         "table_name": "surge_btc",
-		"decimal_display": 4
+		"decimal_display": 4,
+		"decimals": 0
     },
     "SurgeADA": {
         "address": "0xbf6bb9b8004942dfb3c1cde3cb950af78ab8a5af",
@@ -49,7 +52,8 @@
             "transfer": 0.02
         },
         "table_name": "surge_ada",
-		"decimal_display": 4
+		"decimal_display": 4,
+		"decimals": 0
     },
     "SurgeUSLS": {
         "address": "0x2e62e57d1d36517d4b0f329490ac1b78139967c0",
@@ -65,6 +69,23 @@
         "allows_staking": true,
         "underlying_asset_sell_fee": 0.08,
         "table_name": "surge_useless",
-		"decimal_display": 12
+		"decimal_display": 12,
+		"decimals": 0
+    },
+	"SurgeXUSD": {
+        "address": "0x254246331cacbC0b2ea12bEF6632E4C6075f60e2",
+		"mint_address": "0x0000000000000000000000000000000000000000",
+        "symbol": "xUSD",
+		"icon": "https://cdn.discordapp.com/attachments/892852181802291215/907710689890672660/XUSD_White.png",
+		"color": 2274475,
+        "fees": {
+            "buy": 0.0075,
+			"stake": 0.0075,
+            "sell": 0.0025,
+            "transfer": 0.0025
+        },
+        "table_name": "surge_xusd",
+		"decimal_display": 6,
+		"decimals": 18
     }
-  }
+}
