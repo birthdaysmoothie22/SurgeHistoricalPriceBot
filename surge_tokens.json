@@ -1,91 +1,37 @@
 {
-    "SurgeUSD": {
+	"OgSurgeBNB": {
+        "address": "0xE1E1Aa58983F6b8eE8E4eCD206ceA6578F036c21",
+        "abi_name": "og_surge_bnb_abi",
+		"wei_unit": "ether"
+    },
+	"SurgeUSD": {
         "address": "0x14fee7d23233ac941add278c123989b86ea7e1ff",
-        "symbol": "USD",
-		"icon": "https://s2.coinmarketcap.com/static/img/coins/64x64/4687.png",
-		"color": 15644684,
-        "fees": {
-            "buy": 0.06,
-            "sell": 0.06,
-            "transfer": 0.02
-        },
-        "table_name": "surge_usd",
-		"decimal_display": 2,
-		"decimals": 0
+        "abi_name": "surge_usd_abi",
+		"wei_unit": "ether"
     },
     "SurgeETH": {
         "address": "0x5b1d1bbdcc432213f83b15214b93dc24d31855ef",
-        "symbol": "ETH",
-		"icon": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
-		"color": 8487812,
-        "fees": {
-            "buy": 0.06,
-            "sell": 0.06,
-            "transfer": 0.02
-        },
-        "table_name": "surge_eth",
-		"decimal_display": 4,
-		"decimals": 0
+        "abi_name": "surge_eth_abi",
+		"wei_unit": "ether"
     },
     "SurgeBTC": {
         "address": "0xb68c9d9bd82bdf4eeecb22caa7f3ab94393108a1",
-        "symbol": "BTC",
-		"icon": "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
-		"color": 16225050,
-        "fees": {
-            "buy": 0.06,
-            "sell": 0.06,
-            "transfer": 0.03
-        },
-        "table_name": "surge_btc",
-		"decimal_display": 4,
-		"decimals": 0
+        "abi_name": "surge_btc_abi",
+		"wei_unit": "ether"
     },
     "SurgeADA": {
         "address": "0xbf6bb9b8004942dfb3c1cde3cb950af78ab8a5af",
-        "symbol": "ADA",
-		"icon": "https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png",
-		"color": 78766,
-        "fees": {
-            "buy": 0.04,
-            "sell": 0.04,
-            "transfer": 0.02
-        },
-        "table_name": "surge_ada",
-		"decimal_display": 4,
-		"decimals": 0
+        "abi_name": "surge_ada_abi",
+		"wei_unit": "ether"
     },
     "SurgeUSLS": {
         "address": "0x2e62e57d1d36517d4b0f329490ac1b78139967c0",
-        "symbol": "USELESS",
-		"icon": "https://s2.coinmarketcap.com/static/img/coins/64x64/10851.png",
-		"color": 15382313,
-        "fees": {
-            "buy": 0.08,
-            "sell": 0.08,
-            "staked": 0.06,
-            "transfer": 0.04
-        },
-        "allows_staking": true,
-        "underlying_asset_sell_fee": 0.08,
-        "table_name": "surge_useless",
-		"decimal_display": 12,
-		"decimals": 0
+        "abi_name": "surge_useless_abi",
+		"wei_unit": "gwei"
     },
 	"SurgeXUSD": {
         "address": "0x254246331cacbC0b2ea12bEF6632E4C6075f60e2",
-		"mint_address": "0x0000000000000000000000000000000000000000",
-        "symbol": "xUSD",
-		"icon": "https://cdn.discordapp.com/attachments/892852181802291215/907710689890672660/XUSD_White.png",
-		"color": 2274475,
-        "fees": {
-            "buy": 0.0075,
-			"stake": 0.0075,
-            "sell": 0.0025,
-            "transfer": 0.0025
-        },
-        "table_name": "surge_xusd",
-		"decimal_display": 6,
-		"decimals": 18
+        "abi_name": "surge_xusd_abi",
+		"wei_unit": "ether"
     }
 }
